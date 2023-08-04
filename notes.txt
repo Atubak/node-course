@@ -1,0 +1,165 @@
+NOTES:
+
+-- #4
+V8 project:
+- allows js code to be run outside the browser
+
+
+libuv project:
+- allows access to the filesystem, networking, etc. (things that are not available in the browser)
+
+
+why node and not directly v8 and libuv? 
+- node is a wrapper around v8 and libuv that makes it easier to use them. 
+- standard api for interacting with the file system, networking, etc. node uses http, fs, crypto, path etc modules
+
+
+
+
+
+
+-- #5
+pbkdf2 is a hashing algorithm that is used to hash passwords.
+
+In node repo, there is the lib and src folders.
+- lib stores all function that are used by node devs.
+- src stores all the c++ code that is used to build those node functions.
+
+process.binding() is a function that connects the c++ and js functions
+v8 then  allows us to access the c++ code from the src folder into the lib folder by converting the values, basiclly a translator.
+
+
+
+
+
+
+-- #6
+
+-- #7
+- threads
+    - process is an instance of a program running in a computer
+    - a process can have multiple threads
+    - threads are a way to split up the work that a process has to do
+    - threads are like mini processes that live inside a process
+    - threads can run in parallel
+    - threads can share memory
+    - threads are more efficient than processes
+    - the scheduler in the OS assigns threads to the cpu
+    - more cores in cpu = more threads can run in parallel
+    - reading/ writing is referred to as I/O (input/output) operations
+    - I/O operations are slow
+
+
+
+
+-- #8
+- event loop
+    - exists in a thread
+    - every time the event loop runs is called a tick
+    - at the start of the loop it checks whether or not it has to run, if yes it runs, if not it skips and exits the loop
+
+-- #9
+- event loop implementation
+    - 3 checks to see if it should continue
+        - pending timers (setTimeOut, setInterval, setImmediate) setImmediate runs async but still as soon as possible, gets called after the poll phase
+        - pending OS tasks (server listening to port, file system)
+        - pending long running operations (fs module)
+        
+
+-- #10
+- event loop ticks
+steps during the loop:
+        - pending timers
+        - pending OS tasks and operations
+        - then it !!!pauses!!! and waits for new events to happen. it continues when any of the above is completed or the timers have counted down
+        - then it checks for pending timers again but only  calls setImmediate.
+        - then handles any close event (like closing a server like readStream()) 
+
+
+-- #11
+- node is singlethreaded?
+    - node event loop IS single threaded
+    - some of node framework/libraries are not single threaded (run outside of event loop)
+    
+
+-- #12
+- benchmark ./threads.js
+    - calling both functions gives the result of them running at the same time
+    - meaning that node is not single threaded
+
+
+-- #13
+- libuv thread pool
+    - the pbkdf2 function is actually running in c++ code, which uses different threads to run the function
+    - libuv creates 4 threads by default, so there are 5 threads in total (1 event loop and 4 threads for the thread pool)
+
+-- #14
+- multithreading
+    - function call gets assigned to a thread in the thread pool which gets scheduled by the OS  to run on a cpu core
+    - amount of cores in the cpu = amount of threads that can run in parallel
+    
+
+-- #15
+- changing threadpool size
+    - can change this with: process.env.UV_THREADPOOL_SIZE = 2
+    - time to complete the function call decreases because there are less threads to run the function calls but the total time to complete all the functions remains the same 
+
+-- #16
+- the hash function in ./threads.js gets called, event loop starts, function completes, event loop checks for pending callbacks, calls console.log, event loop exits
+
+-- #17
+- OS operations
+    - writing async.js
+
+-- #18
+- Libuv OS delegation
+    - libuv delegates the real https request to the OS by using OS async helpers
+    - like this, the OS handles everything and node can continue to run other code
+
+-- #19
+- anything concerning networking is handled by the OS
+- for anything else it depends on the OS, whether it is handled by the OS or by node/Libuv
+
+
+-- #20
+review & common questions
+
+
+-- #21
+- weird node behaviour
+- fs call in multitask.js is normally ~20ms but running the whole file makes it many times slower, why?
+
+-- #22
+- unexpected event loop events
+    - why http req returns first? both fs and http are async
+    - why does the http req return first even though it takes longer to complete?
+    Answer: fs makes use of threadpool, http req uses OS as a networking thing
+
+    - delay of the fs call is explained by the actual process it needs to take to complete the call
+        - fs calls the hard drive first for metadata of the file
+        - while waiting for the metadata, the thread pool continues with the next pending task
+        - since all threads in the pool are busy, the fs call has to wait for a thread to become available
+        - when a thread becomes available, the fs call can continue
+
+
+---------- EVENT LOOP SECTION DONE ----------
+
+---------- ENHANCING NODE PERFORMANCE SECTION START ----------
+-- #23
+- enhancing PERFORMANCE
+- use node in cluster mode (recommended)
+- use worker threads (expirimental)
+
+
+-- #24
+- express setup
+
+-- #25
+- blocking the event loop
+    - the event loop is blocked when a function takes a long time to complete
+    - this is bad because it prevents the event loop from running other code or other requests
+
+-- #26
+- clustering
+    - cluster is a collection of node servers on one machine
+    - cluster manager is responsible for the health of all these node instances
