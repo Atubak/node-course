@@ -188,3 +188,7 @@ review & common questions
 -- #30
 - benchmark refactor, when clustering doesnt work that well
     - normally each child in the cluster has the default of 4 threads in the thread pool
+
+-- #31
+- need more children!
+    - 
