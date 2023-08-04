@@ -14,13 +14,14 @@ if (cluster.isMaster) {
     // a single call creates a single child, same as calling index.js without cluster
     // to create multiple children, call fork multiple times
 
-    for (let i = 0; i < 1; i++) {
+    for (let i = 0; i < 6; i++) {
         cluster.fork();
     }
 } else {
     // Im a child, Im going to act like a server and do nothing else
     app.get("/", (req, res) => {
         crypto.pbkdf2("a", "b", 100000, 512, "sha512", () => {
+            console.log("bingo");
             res.send("Hi there");
         });
     });

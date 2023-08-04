@@ -191,4 +191,8 @@ review & common questions
 
 -- #31
 - need more children!
-    - 
+    - limiting the amount of threads in the thread pool to 1
+    - it shows the limitations of clustering
+    - too many clusters can cause a lot of overhead and slow down the server
+    - best practice for clusters is to have the same amount of clusters as the amount of cores in the cpu
+    
