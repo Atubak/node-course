@@ -195,4 +195,36 @@ review & common questions
     - it shows the limitations of clustering
     - too many clusters can cause a lot of overhead and slow down the server
     - best practice for clusters is to have the same amount of clusters as the amount of cores in the cpu
-    
+
+
+-- #32
+- PM2 cli
+    - cluster management software
+
+-- #33
+- pm2 workings
+    - if a child crashes, pm2 will restart it by itself
+    - see pm2 documentation for more info https://pm2.keymetrics.io/docs/usage/quick-start/
+
+
+-- #34
+- webworker threads
+    - worker threads are stable in node 12
+
+-- #36
+- worker threads in action
+- heavy duty business logic that takes a long time to complete can be offloaded to a worker
+- worker interface connects with the worker through a postMessage and onmessage api structure
+- the worker interface and worker communicate to each other through the postMessage and onmessage api structure
+- worker threads ONLY make sense when the work being off loaded is normally blocking the event loop 
+- if the work is not blocking the event loop, it is already being offloaded to threads in the libuv thread pool or to the OS
+
+- make sure to use the function keyword when working with the onmessage and postMessage methods to not fuck up the context 
+- also pay attention not to send numbers as the res
+
+
+----------------- ENHANCING NODE PERFORMANCE SECTION START -------------------------------
+
+
+-- #38
+- npm install --legacy-peer-deps
