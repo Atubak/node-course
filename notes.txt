@@ -163,3 +163,28 @@ review & common questions
 - clustering
     - cluster is a collection of node servers on one machine
     - cluster manager is responsible for the health of all these node instances
+    - running index.js, cluster manager is created, cluster.fork() is called
+    - cluster.fork() takes the index.js and creates the worker instances of index.js
+
+
+-- #27
+- forking children
+    - create if statement to check for cluster.isMaster
+    - if master, create cluster.fork() to create worker instances
+    - if worker, run index.js code
+
+
+-- #28
+- cluster in action
+    - create clusters with cluster.fork() and check response times for request
+
+-- #29
+- benchmarking server performance
+    - cannot use infinite amount of children in server because of memory limitations
+    - using Apache Benchmarking Tool (ab) to test server performance
+    - ab -c flag stands for concurrency, doesn't make this number of request at once but makes sure there are always this many requests in progress/pending
+    
+
+-- #30
+- benchmark refactor, when clustering doesnt work that well
+    - normally each child in the cluster has the default of 4 threads in the thread pool
